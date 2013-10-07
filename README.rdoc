@@ -1,0 +1,6 @@
+= poiesis
+
+Describe your project here
+
+:include:poiesis.rdoc
+

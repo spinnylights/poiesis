@@ -1,0 +1,5 @@
+= poiesis
+
+Generate this with
+    poiesis rdoc
+After you have described your command line interface

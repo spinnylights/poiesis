@@ -1,0 +1,75 @@
+#!/usr/bin/env ruby
+require 'gli'
+begin # XXX: Remove this begin/rescue before distributing your app
+require 'poiesis'
+include Poiesis
+include Term::ANSIColor
+rescue LoadError
+  STDERR.puts "In development, you need to use `bundle exec bin/poiesis` to run your app"
+  STDERR.puts "At install-time, RubyGems will make sure lib, etc. are in the load path"
+  STDERR.puts "Feel free to remove this message from bin/poiesis now"
+  exit 64
+end
+
+include GLI::App
+
+program_desc 'Poiesis helps you work a certain number of hours on a project by a deadline.'
+
+version Poiesis::VERSION
+
+desc 'Set or unset your goal, deadline, etc.'
+command :set do |c|
+
+  c.desc 'Set or unset your goal'
+  c.arg_name underlined_args('hours to work', 'date of deadline')
+  c.command :goal do |goal|
+    goal.desc 'Unset your goal'
+    goal.switch [:n,:none]
+
+    goal.action do |global_options,options,args| 
+      if options[:none]
+        freshen(@goal_hash)
+        puts "Now there is no goal." 
+      else
+        new_settings_for(@goal_hash, { hours: args[0], deadline: args[1] })
+        puts "Your new goal is #{@goal_hash[:hours]} hours of work by " +
+             "#{@goal_hash[:deadline]}."
+      end
+    end
+  end
+end
+
+desc 'Show your current goal'
+command :show do |c|
+  c.action do |global_options,options,args|
+    if @goal_hash[:hours] == "none"
+      puts "No goal is set."
+    else
+      puts "#{@goal_hash[:hours]} hours of work by #{parse_and_format(@goal_hash[:deadline])}."
+    end
+  end
+end
+
+pre do |global,command,options,args|
+  if File.exists?(goal_file)
+    loaded_goal_file = File.open(goal_file)
+    @goal_hash = Psych.load(loaded_goal_file.read)
+  else
+    freshen(@goal_hash = {})
+  end
+  true
+end
+
+post do |global,command,options,args|
+  File.open(goal_file, "w+") do |file|
+    file.write(Psych.dump(@goal_hash))
+  end
+end
+
+on_error do |exception|
+  # Error logic here
+  # return false to skip default error handling
+  true
+end
+
+exit run(ARGV)
