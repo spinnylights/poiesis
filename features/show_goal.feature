@@ -2,7 +2,6 @@ Feature: Show current goal
   In order to know what I'm working towards
   I want to view the goal of time worked and deadline
 
-  @wip
   Scenario: No goal is currently set
     When I run `poiesis set goal --none`
     And  I run `poiesis show goal`
