@@ -1,6 +1,7 @@
 require 'poiesis/version.rb'
 require 'poiesis/goal_tracker.rb'
 require 'poiesis/time_utils.rb'
+require 'poiesis/output_helper.rb'
 require 'chronic'
 require 'active_support/core_ext/integer/inflections'
 require 'psych'
