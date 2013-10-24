@@ -22,6 +22,18 @@ module TimeUtils
       /(?<hours>\d+):(?<minutes>\d+)/.match(time)[:"#{section}"]
     end
 
+    def hours_minutes(remaining_time)
+      hours_minutes = {} 
+      hours_minutes[:hours], hours_minutes[:minutes] = 
+        remaining_time.div(60).divmod(60)
+      if hours_minutes[:minutes] == 0
+        hours_minutes[:minutes] = '00'
+      elsif hours_minutes[:minutes] < 10
+        hours_minutes[:minutes] = "0#{hours_minutes[:minutes]}"
+      end
+      "#{hours_minutes[:hours]}:#{hours_minutes[:minutes]}"
+    end
+
     private
 
       def during_the_same_day
@@ -38,16 +50,6 @@ module TimeUtils
           times << time_string_to_time(i)
         end
         times 
-      end
-
-      def hours_minutes(remaining_time)
-        hours_minutes = {} 
-        hours_minutes[:hours], hours_minutes[:minutes] = 
-          remaining_time.div(60).divmod(60)
-        if hours_minutes[:minutes] == 0
-          hours_minutes[:minutes] = '00'
-        end
-        "#{hours_minutes[:hours]}:#{hours_minutes[:minutes]}"
       end
 
       def check_for_section_format(section)

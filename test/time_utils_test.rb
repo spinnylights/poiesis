@@ -47,4 +47,16 @@ class TimeUtilsTest < Test::Unit::TestCase
   def test_select_hours_or_minutes_wont_accept_letter_in_time_string
     select_hours_or_minutes_arg_test("f:23")
   end
+
+  def test_hours_minutes_with_only_hours
+    assert_equal '10:00', TimeUtils.hours_minutes(36000)
+  end
+
+  def test_hours_minutes_with_less_than_ten_minutes
+    assert_equal '10:01', TimeUtils.hours_minutes(36060)
+  end
+
+  def test_hours_minutes_with_ten_minutes
+    assert_equal '10:01', TimeUtils.hours_minutes(36060)
+  end
 end
