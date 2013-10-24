@@ -8,10 +8,6 @@ class DefaultTest < Test::Unit::TestCase
 
   def teardown
   end
-
-  def test_parse_and_format
-    assert_equal parse_and_format('4/7/2030'), 'April 7th, 2030' 
-  end
   
   def test_underlined_args
     assert_equal underlined_args('bags', 'rags', 'lags'), 
@@ -33,12 +29,6 @@ class DefaultTest < Test::Unit::TestCase
   def test_goal_file
     assert_equal goal_file, File.join(ENV['HOME'], '.goal.yml')
   end
-
-  def test_log
-    assert_equal log("8:29", "3:42"), "4:47"
-    assert_equal log("20:00", "1:02"), "18:58"
-    assert_equal log("8:29", "9:42"), "finished"
-  end 
 
   def test_time_capture
     time = "2:34"
