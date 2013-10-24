@@ -1,5 +1,6 @@
 require 'aruba/cucumber'
 require 'fileutils'
+require_relative '../../lib/poiesis/goal_tracker.rb'
 
 include FileUtils
 include Poiesis
@@ -26,7 +27,7 @@ Before do
   @original_rubylib = ENV['RUBYLIB']
   ENV['RUBYLIB'] = LIB_DIR + File::PATH_SEPARATOR + ENV['RUBYLIB'].to_s
   make_home_fake
-  rm_rf goal_file
+  rm_rf GoalTracker.new.save_file
 end
 
 After do
