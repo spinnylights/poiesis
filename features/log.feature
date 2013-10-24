@@ -2,7 +2,6 @@ Feature: Log time worked
   In order to track my progress towards my goal
   I want to record time I have worked
 
-@wip
   Scenario: Made progress
     When I run `poiesis set goal 20 2/5/2038`
     And  I run `poiesis log 8:34`
@@ -10,7 +9,6 @@ Feature: Log time worked
     When  I run `poiesis show progress`
     Then the output from "poiesis show progress" should contain "You have 11 hours and 26 minutes of work to complete by February 5th, 2038."
 
-@wip
   Scenario: Log twice
     When I run `poiesis set goal 20 3/30/2032`
     And  I run `poiesis log 9:00`

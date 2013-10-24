@@ -1,4 +1,5 @@
 require 'poiesis/version.rb'
+require 'poiesis/goal_tracker.rb'
 require 'chronic'
 require 'active_support/core_ext/integer/inflections'
 require 'psych'

@@ -28,12 +28,13 @@ command :set do |c|
 
     goal.action do |global_options,options,args| 
       if options[:none]
-        freshen(@goal_hash)
+        @goal_tracker = GoalTracker.new
         puts "Now there is no goal." 
       else
-        new_settings_for(@goal_hash, { hours: args[0], deadline: args[1] })
-        puts "Your new goal is #{@goal_hash[:hours]} hours of work by " +
-             "#{@goal_hash[:deadline]}."
+        @goal_tracker.hours = @goal_tracker.remaining = args[0]
+        @goal_tracker.deadline = args[1]
+        puts "Your new goal is #{@goal_tracker.hours} hours of work by " +
+             "#{parse_and_format(@goal_tracker.deadline)}."
       end
     end
   end
@@ -45,10 +46,10 @@ command :show do |c|
   c.desc 'Show your current goal'
   c.command :goal do |goal|
     goal.action do |global_options,options,args|
-      if @goal_hash[:hours] == "none"
+      unless @goal_tracker.hours
         puts "No goal is set."
       else
-        puts "#{@goal_hash[:hours]} hours of work by #{@goal_hash[:deadline]}."
+        puts "#{@goal_tracker.hours} hours of work by #{parse_and_format(@goal_tracker.deadline)}."
       end
     end
   end
@@ -56,7 +57,11 @@ command :show do |c|
   c.desc 'Show how much work you have left'
   c.command :progress do |prog|
     prog.action do |global_options,options,args|
-      puts "You have #{time_capture(@goal_hash[:remaining], :hours)} hours#{and_minutes_if_minutes(@goal_hash[:remaining]) || " "}of work to complete by #{@goal_hash[:deadline]}."
+      if @goal_tracker.remaining == 'finished'
+        puts "Your goal is complete!"
+      else
+        puts "You have #{time_capture(hours_minutes(@goal_tracker.remaining.to_i * 3600), :hours)} hours#{and_minutes_if_minutes(@goal_tracker.remaining) || " "}of work to complete by #{parse_and_format(@goal_tracker.deadline)}."
+      end
     end
   end
 end
@@ -64,30 +69,29 @@ end
 desc 'Manually log time worked'
 command :log do |c|
   c.action do |global_options,options,args|
-    if log(@goal_hash[:hours], args[0]) == "finished"
+    if log(@goal_tracker.remaining, args[0]) == "finished"
       puts "You met your goal!"
-      freshen(@goal_hash)
+      @goal_tracker = GoalTracker.new
     else
-      @goal_hash[:remaining] = log("#{@goal_hash[:remaining]}", args[0])
+      @goal_tracker.remaining = log("#{@goal_tracker.remaining}", args[0])
       puts "Logged #{time_capture(args[0], :hours)} hours and #{time_capture(args[0], :minutes)} minutes of work."
     end
   end
 end
 
 pre do |global,command,options,args|
-  if File.exists?(goal_file)
-    loaded_goal_file = File.open(goal_file)
-    @goal_hash = Psych.load(loaded_goal_file.read)
+  if File.exists?(GoalTracker.defaults_hash[:save_file])
+    loaded_goal_file = File.open(GoalTracker.defaults_hash[:save_file])
+    @goal_tracker = GoalTracker.new
+    @goal_tracker.load_settings
   else
-    freshen(@goal_hash = {})
+    @goal_tracker = GoalTracker.new
   end
   true
 end
 
 post do |global,command,options,args|
-  File.open(goal_file, "w+") do |file|
-    file.write(Psych.dump(@goal_hash))
-  end
+  @goal_tracker.save
 end
 
 on_error do |exception|
