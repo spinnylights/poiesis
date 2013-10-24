@@ -29,26 +29,4 @@ class DefaultTest < Test::Unit::TestCase
   def test_goal_file
     assert_equal goal_file, File.join(ENV['HOME'], '.goal.yml')
   end
-
-  def test_time_capture
-    time = "2:34"
-    assert_equal time_capture(time, :hours), "2"
-    assert_equal time_capture(time, :minutes), "34"
-    time = "wags"
-  end
-
-  def time_capture_arg_test(time, section=:hours)
-    assert_raise ArgumentError do
-      time_capture(time, section)
-    end
-  end
-
-  def test_time_capture_only_takes_hours_or_minutes
-    time_capture_arg_test("12:23", :fish)
-  end 
-
-  def test_time_capture_only_accepts_time_string
-    time_capture_arg_test("2:333")
-    time_capture_arg_test("f:23")
-  end
 end

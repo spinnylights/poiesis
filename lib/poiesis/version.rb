@@ -25,24 +25,6 @@ module Poiesis
     File.join(ENV['HOME'], '.goal.yml')
   end
 
-  def check_for_time_format(time)
-    unless time =~ /(\d+):(\d{2})\z/
-      raise ArgumentError, "First arg must be in format 'd+:dd', such as '23:12'"
-    end
-  end
-
-  def check_for_section_format(section)
-    unless section == :hours || section == :minutes
-      raise ArgumentError, "Second arg must be either :hours or :minutes"
-    end
-  end
-
-  def time_capture(time, section)
-    check_for_time_format(time)
-    check_for_section_format(section)
-    /(?<hours>\d+):(?<minutes>\d+)/.match(time)[:"#{section}"]
-  end
-
   def and_minutes_if_minutes(time)
     minutes = time_capture(time, :minutes)
     if minutes == '00'

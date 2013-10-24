@@ -16,6 +16,12 @@ module TimeUtils
       end 
     end
 
+    def select_hours_or_minutes(time, section)
+      check_for_time_format(time)
+      check_for_section_format(section)
+      /(?<hours>\d+):(?<minutes>\d+)/.match(time)[:"#{section}"]
+    end
+
     private
 
       def during_the_same_day
@@ -42,6 +48,18 @@ module TimeUtils
           hours_minutes[:minutes] = '00'
         end
         "#{hours_minutes[:hours]}:#{hours_minutes[:minutes]}"
+      end
+
+      def check_for_section_format(section)
+        unless section == :hours || section == :minutes
+          raise ArgumentError, "Second arg must be either :hours or :minutes"
+        end
+      end
+
+      def check_for_time_format(time)
+        unless time =~ /(\d+):(\d{2})\z/
+          raise ArgumentError, "First arg must be in format 'd+:dd', such as '23:12'"
+        end
       end
   end
 end
