@@ -35,7 +35,7 @@ command :set do |c|
         @goal_tracker.hours = @goal_tracker.remaining = args[0]
         @goal_tracker.deadline = args[1]
         puts "Your new goal is #{@goal_tracker.hours} hours of work by " +
-             "#{parse_and_format(@goal_tracker.deadline)}."
+             "#{TimeUtils.format_date_string(@goal_tracker.deadline)}."
       end
     end
   end
@@ -50,7 +50,7 @@ command :show do |c|
       unless @goal_tracker.hours
         puts "No goal is set."
       else
-        puts "#{@goal_tracker.hours} hours of work by #{parse_and_format(@goal_tracker.deadline)}."
+        puts "#{@goal_tracker.hours} hours of work by #{TimeUtils.format_date_string(@goal_tracker.deadline)}."
       end
     end
   end
@@ -61,7 +61,7 @@ command :show do |c|
       if @goal_tracker.remaining == 'finished'
         puts "Your goal is complete!"
       else
-        puts "You have #{time_capture(hours_minutes(@goal_tracker.remaining.to_i * 3600), :hours)} hours#{and_minutes_if_minutes(@goal_tracker.remaining) || " "}of work to complete by #{parse_and_format(@goal_tracker.deadline)}."
+        puts "You have #{TimeUtils.select_hours_or_minutes(TimeUtils.hours_minutes(@goal_tracker.remaining.to_i * 3600), :hours)} hours#{and_minutes_if_minutes(@goal_tracker.remaining) || " "}of work to complete by #{TimeUtils.format_date_string(@goal_tracker.deadline)}."
       end
     end
   end
@@ -70,12 +70,12 @@ end
 desc 'Manually log time worked'
 command :log do |c|
   c.action do |global_options,options,args|
-    if log(@goal_tracker.remaining, args[0]) == "finished"
+    if TimeUtils.remaining_time(@goal_tracker.remaining, args[0]) == "finished"
       puts "You met your goal!"
       @goal_tracker = GoalTracker.new
     else
-      @goal_tracker.remaining = log("#{@goal_tracker.remaining}", args[0])
-      puts "Logged #{time_capture(args[0], :hours)} hours and #{time_capture(args[0], :minutes)} minutes of work."
+      @goal_tracker.remaining = TimeUtils.remaining_time("#{@goal_tracker.remaining}", args[0])
+      puts "Logged #{TimeUtils.select_hours_or_minutes(args[0], :hours)} hours and #{TimeUtils.select_hours_or_minutes(args[0], :minutes)} minutes of work."
     end
   end
 end
